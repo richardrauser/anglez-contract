@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.24;
 
 library StringUtils {
     function uintToString(uint _i) internal pure returns (string memory str) {

@@ -59,6 +59,61 @@ describe("Planes", function () {
     // });
   });
 
+  describe("Minting", function () {
+    it("Should mint random", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      const mintResult = await contract.mintRandom(0);
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+      // expect(await lock.unlockTime()).to.equal(unlockTime);
+    });
+
+    it("Should mint custom", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      const mintResult = await contract.mintCustom(
+        0,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90,
+        false,
+        { value: ethers.parseEther("0.01") }
+      );
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+    });
+
+    it("Should set random mint price", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      const mintResult = await contract.setRandomMintPrice(
+        ethers.parseEther("0.1")
+      );
+      const mintPrice = await contract.getRandomMintPrice();
+
+      expect(mintPrice).to.equal(ethers.parseEther("0.1"));
+    });
+
+    it("Should set custom mint price", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      const mintResult = await contract.setCustomMintPrice(
+        ethers.parseEther("0.2")
+      );
+      const mintPrice = await contract.getCustomMintPrice();
+
+      expect(mintPrice).to.equal(ethers.parseEther("0.2"));
+    });
+  });
+
   describe("Withdrawals", function () {
     it("Should transfer the funds to the owner", async function () {
       const { contract, owner } = await loadFixture(deployPlanesFixture);

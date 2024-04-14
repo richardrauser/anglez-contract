@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
 
 struct Tint {
     uint8 red; // 0 - 255
@@ -10,7 +12,7 @@ struct TokenParams {
     uint24 randomSeed;
     uint8 zoom; // 0 - 100
     Tint tint;
-    uint8 shapes; // 1 - 20
+    uint8 shapeCount; // 1 - 20
     bool cyclic; // 25 - 250 
     bool custom; // 25 - 250
 }

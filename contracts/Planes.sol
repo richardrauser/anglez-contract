@@ -98,7 +98,7 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
             randomSeed: seed,
             zoom: 0,
             tint: tint,
-            shapes: 0,
+            shapeCount: 0,
             cyclic: false,
             custom: false
         }); 
@@ -113,18 +113,16 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
         require(msg.value >= customMintPrice, "Insufficient funds");
         require(!usedRandomSeeds[seed], "Seed already used");
 
-        Tint memory tint = Tint({
-            red: tintRed,
-            green: tintGreen,
-            blue: tintBlue,
-            alpha: tintAlpha
-        });
-
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
             zoom: zoom,
-            tint: tint,
-            shapes: shapeCount,
+            tint: Tint({
+                red: tintRed,
+                green: tintGreen,
+                blue: tintBlue,
+                alpha: tintAlpha
+            }),
+            shapeCount: shapeCount,
             cyclic: isCyclic,
             custom: true
         }); 

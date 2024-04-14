@@ -18,43 +18,28 @@ library ArtBuilder {
     
     function build(TokenParams memory tokenParams) internal pure returns (string memory) {
 
-        uint24 randomSeed;
-        uint8 zoom; // 0 - 100
-        Tint memory tint;
-        // uint8 tintRed; // 0 - 255
-        // uint8 tintGreen; // 0 - 255
-        // uint8 tintBlue; // 0 - 255
-        // uint8 tintAlpha; // 0 - 255
-        uint8 shapeCount; // 1 - 20
-        bool cyclic; // 25 - 250 
+        if (!tokenParams.custom) {
+            // TODO: ranomize params
 
-        if (tokenParams.custom) {
-            zoom = tokenParams.zoom;
-            tint = tokenParams.tint;
-            // tintRed = tokenParams.tintRed;
-            // tintBlue = tokenParams.tintGreen;
-            // tintGreen = tokenParams.tintGreen;
-            // tintAlpha = tokenParams.tintAlpha;
-            shapeCount = tokenParams.shapes;
-            cyclic = tokenParams.cyclic;
-        } else {
-            
         }
+        
 
-        (string memory viewBox, string memory clipRect) = getViewBoxClipRect(zoom);
+        (string memory viewBox, string memory clipRect) = getViewBoxClipRect(tokenParams.zoom);
         string memory defs = string(abi.encodePacked("<defs><clipPath id='masterClip'><rect ", clipRect, "/></clipPath></defs>"));
 
         uint maxPolyRepeat;
 
-        if (cyclic) {
-            maxPolyRepeat = Random.randomInt(randomSeed + 300, 2, 8);             
+        if (tokenParams.cyclic) {
+            maxPolyRepeat = Random.randomInt(tokenParams.randomSeed + 300, 2, 8);             
         } else {
             maxPolyRepeat = 1;
         }
 
 
-        string memory shapes = getShapes(randomSeed, tint, shapeCount, maxPolyRepeat); 
-        return string(abi.encodePacked("<svg xmlns='http://www.w3.org/2000/svg' viewBox='", viewBox, "'>", defs, "<g clip-path='url(#masterClip)'>", shapes, "</g></svg>"));
+        string memory shapes = getShapes(tokenParams, maxPolyRepeat);
+        return string(abi.encodePacked("<svg xmlns='http://www.w3.org/2000/svg' viewBox='", 
+            viewBox, "'>", 
+            defs, "<g clip-path='url(#masterClip)'>", shapes, "</g></svg>"));
     }
 
 
@@ -76,16 +61,18 @@ library ArtBuilder {
         }
     }
 
-    function getShapes(uint24 randomSeed, Tint memory tint, uint8 shapeCount, uint maxPolyRepeat) private pure returns (string memory) {
+    function getShapes(TokenParams memory tokenParams, uint maxPolyRepeat) private pure returns (string memory) {
         string memory shapes = "";
         // TODO: consider best max ( 5 15?)
         // console.log('_------- RANDOM SEED: ' + randomSeed);
         uint minX = 1000;
         uint maxX = 0;
 
+        uint randomSeed = tokenParams.randomSeed;
+
         // polygon loop
-        for (uint i = 0; i < shapeCount; i++) {
-            uint pointCount = Random.randomInt(randomSeed + i, 3, 5);
+        for (uint i = 0; i < tokenParams.shapeCount; i++) {
+            uint pointCount = Random.randomInt(tokenParams.randomSeed + i, 3, 5);
 
             // console.log('polygon: ' + i);
             // console.log('pointCount: ' + pointCount);
@@ -95,50 +82,32 @@ library ArtBuilder {
             // TODO: folded shapes by repeating points?
 
             // points loop
-            // for (uint j = 0; j < pointCount; j++) {
+            for (uint j = 0; j < pointCount; j++) {
+                uint x1 = Random.randomInt(tokenParams.randomSeed + i + j + 40, 0, 1000);
+                points = string(abi.encodePacked(points, 
+                    StringUtils.uintToString(x1), 
+                    ",", 
+                    Random.randomIntStr(tokenParams.randomSeed + i + j + 50, 0, 1000), 
+                    " "));
 
-            //     uint x1 = Random.randomInt(randomSeed + i + j + 40, 0, 1000);
-            //     uint y1 = Random.randomInt(randomSeed + i + j + 50, 0, 1000);
-            //     points = string(abi.encodePacked(points, 
-            //         StringUtils.uintToString(x1), 
-            //         ",", 
-            //         StringUtils.uintToString(y1), 
-            //         " "));
-
-            //     if (x1 > maxX) {
-            //         maxX = x1;
-            //     }
-            //     if (x1 < minX) {
-            //         minX = x1;
-            //     }
-            // }
+                if (x1 > maxX) {
+                    maxX = x1;
+                }
+                if (x1 < minX) {
+                    minX = x1;
+                }
+            }
 
             // string memory fillColour = getColour(randomSeed + i + 13, tint);
-
-            string memory gradientColour1 = getColour(randomSeed + i + 13, tint);
-            string memory gradientColour2 = getColour(randomSeed + i + 14, tint);
-            string memory gradientColour3 = getColour(randomSeed + i + 15, tint);
 
             // console.log(`gradientColour1: ${gradientColour1}`);
             // console.log(`gradientColour2: ${gradientColour2}`);
             // console.log(`gradientColour3: ${gradientColour3}`);
 
-            uint polygonOpacity;
-            uint midStopOpacity;
-
-            if (maxPolyRepeat < 4) {
-                polygonOpacity = Random.randomInt(randomSeed + i + 16, 80, 100) / 100;
-                midStopOpacity = Random.randomInt(randomSeed + i + 20, 40, 90) / 100;
-            } else {
-                polygonOpacity = Random.randomInt(randomSeed + i + 16, 50, 80) / 100;
-                midStopOpacity = Random.randomInt(randomSeed + i + 20, 30, 90) / 100;
-            }
-
-            uint gradientRotation = Random.randomInt(randomSeed + i + 15, 0, 360);
 
             // console.log('gradientRotation: ' + gradientRotation);
 
-            uint polygonCount = Random.randomInt(randomSeed + 17, 1, maxPolyRepeat);
+            uint polygonCount = Random.randomInt(tokenParams.randomSeed + 17, 1, maxPolyRepeat);
             string memory polygons = "";
             uint polyRotation = 0;
             uint polyRotationDelta = 360 / polygonCount; //randomIntFromInterval(randomSeed + 18, 10, 180);
@@ -151,46 +120,48 @@ library ArtBuilder {
                     ", 500, 500)' fill='url(#gradient", 
                     StringUtils.uintToString(i), 
                     ")' opacity='", 
-                    StringUtils.uintToString(polygonOpacity), 
+                    StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(tokenParams.randomSeed + i + 16, 80, 100) : Random.randomInt(tokenParams.randomSeed + i + 16, 50, 80)) / 100), 
                     "' />"));
 
                 // polygons += `<polygon points="${points}" transform="rotate(${polyRotation}, 500, 500)" fill="url(#gradient${i})" opacity="${polygonOpacity}" />`;
                 polyRotation += polyRotationDelta;
             }
 
-            shapes = string(abi.encodePacked(shapes, 
-                "<linearGradient id='gradient", StringUtils.uintToString(i), "' gradientTransform='rotate(", 
-                StringUtils.uintToString(gradientRotation), 
-                ")'>",
-                "<stop offset='0%' stop-color='", gradientColour1, "'/>",
-                "<stop offset='50%' stop-color='", gradientColour2, "' stop-opacity='", 
-                StringUtils.uintToString(midStopOpacity), 
-                "'/>",
-                "<stop offset='100%' stop-color='", gradientColour3, "'/>",
-                "</linearGradient>",
-                polygons
-            ));
-
-            // shapes += `
-            // <linearGradient id="gradient${i}" gradientTransform="rotate(${gradientRotation})">
-            // <stop offset="0%" stop-color="${gradientColour1}" />
-            // <stop offset="50%" stop-color="${gradientColour2}" stop-opacity="${midStopOpacity}" />
-            // <stop offset="100%" stop-color="${gradientColour3}" />
-            // </linearGradient>
-            // ${polygons}
-            // TODO: consider drop shadow
-            // shapes += `;
-            //   <rect x="{$minX}" y="1100" width="${
-            //     maxX - minX
-            //   }" height="10" fill="#fff" opacity="0"/>
-            // `;
-
-            //    <polygon points="${points}" fill="url(#gradient${i})" opacity="${polygonOpacity}" />    `;
+            shapes = addShapes(shapes, i, tokenParams, maxPolyRepeat, polygons);
 
             randomSeed += 100;
         }
 
         return shapes;
+
+    }
+
+    function addShapes(string memory shapes, uint i, TokenParams memory tokenParams, uint maxPolyRepeat, string memory polygons) private pure returns (string memory) {
+
+            uint midStopOpacity;
+
+            if (maxPolyRepeat < 4) {
+                midStopOpacity = Random.randomInt(tokenParams.randomSeed + i + 20, 40, 90) / 100;
+            } else {
+                midStopOpacity = Random.randomInt(tokenParams.randomSeed + i + 20, 30, 90) / 100;
+            }
+
+            uint gradientRotation = Random.randomInt(tokenParams.randomSeed + i + 15, 0, 360);
+
+            return string(abi.encodePacked(shapes, 
+                "<linearGradient id='gradient", StringUtils.uintToString(i), "' gradientTransform='rotate(", 
+                StringUtils.uintToString(gradientRotation), 
+                ")'>",
+                "<stop offset='0%' stop-color='", getColour(tokenParams.randomSeed + i + 13, tokenParams.tint), "'/>",
+                "<stop offset='50%' stop-color='", getColour(tokenParams.randomSeed + i + 14, tokenParams.tint), "' stop-opacity='", 
+                StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(tokenParams.randomSeed + i + 20, 40, 90) : Random.randomInt(tokenParams.randomSeed + i + 20, 30, 90)) / 100), 
+                "'/>",
+                "<stop offset='100%' stop-color='", getColour(tokenParams.randomSeed + i + 15, tokenParams.tint), "'/>",
+                "</linearGradient>",
+                polygons
+            ));
+
+
 
     }
 
