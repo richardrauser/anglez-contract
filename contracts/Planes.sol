@@ -158,8 +158,8 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
         // TODO: Consider if base64 encoding is necessary.. which chain to use?
         // Base64 encode because OpenSea does not interpret data properly as plaintext served from Polygon
         return string(abi.encodePacked(
-            'data:application/json,{"name":"CWS #',  StringUtils.uintToString(_tokenId), ': a stunning Cosmic World",'
-                '"description": " https://planez.xyz", ', 
+            'data:application/json,{"name":"PLZ #',  StringUtils.uintToString(_tokenId), ': beautiful abstract planes",'
+                '"description": "Planez are colorful and silly. https://planez.xyz", ', 
                 ArtBuilder.getTraits(tokenParamsMapping[_tokenId]), ', '
                 '"image": "data:image/svg+xml,', 
                 generateSvg(_tokenId), 

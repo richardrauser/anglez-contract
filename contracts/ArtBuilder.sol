@@ -6,12 +6,14 @@ import "./Random.sol";
 import "./TokenParams.sol";
 import "./ColourWork.sol";
 
+import "hardhat/console.sol";
+
 library ArtBuilder {
 
     function getColour(uint randomSeed, Tint memory tint) private pure returns (string memory) {
         uint red = ColourWork.safeTint(Random.randomInt(randomSeed, 0, 255), tint.red, tint.alpha);
-        uint green = ColourWork.safeTint(Random.randomInt(randomSeed + 1, 0, 255), tint.green, tint.alpha);
-        uint blue = ColourWork.safeTint(Random.randomInt(randomSeed + 2, 0, 255), tint.blue, tint.alpha);
+        uint green = ColourWork.safeTint(Random.randomInt(randomSeed + 2, 0, 255), tint.green, tint.alpha);
+        uint blue = ColourWork.safeTint(Random.randomInt(randomSeed + 1, 0, 255), tint.blue, tint.alpha);
 
         return ColourWork.rgbString(red, green, blue);        
     }
@@ -19,12 +21,12 @@ library ArtBuilder {
     function build(TokenParams memory tokenParams) internal pure returns (string memory) {
 
         if (!tokenParams.custom) {
-            // TODO: ranomize params
+            // TODO: randomize params
 
         }
         
 
-        (string memory viewBox, string memory clipRect) = getViewBoxClipRect(tokenParams.zoom);
+        (string memory viewBox, string memory clipRect) = getViewBoxClipRect(150 - tokenParams.zoom);
         string memory defs = string(abi.encodePacked("<defs><clipPath id='masterClip'><rect ", clipRect, "/></clipPath></defs>"));
 
         uint maxPolyRepeat;
@@ -44,16 +46,16 @@ library ArtBuilder {
 
 
     function getViewBoxClipRect(uint zoom) private pure returns (string memory, string memory) {
-        zoom = zoom * 20;
-        string memory widthHeight = StringUtils.uintToString(1000 + zoom);
+        zoom = zoom * 10;
+        string memory widthHeight = StringUtils.uintToString(500 + zoom);
 
-        if (zoom > 1000) {
-            string memory offset = StringUtils.uintToString((zoom - 1000) / 2);
+        if (zoom > 500) {
+            string memory offset = StringUtils.uintToString((zoom - 500) / 2);
             string memory viewBox = string(abi.encodePacked("-", offset, " -", offset, " ",  widthHeight, " ", widthHeight));
             string memory clipRect = string(abi.encodePacked("x='-", offset, "' y='-", offset, "' width='",  widthHeight, "' height='", widthHeight, "'"));
             return (viewBox, clipRect);
         } else {
-            string memory offset = StringUtils.uintToString((zoom == 1000 ? 0 : (1000 - zoom) / 2));
+            string memory offset = StringUtils.uintToString((zoom == 500 ? 0 : (500 - zoom) / 2));
             string memory viewBox = string(abi.encodePacked(offset, " ", offset, " ",  widthHeight, " ", widthHeight));
             string memory clipRect = string(abi.encodePacked("x='", offset, "' y='", offset, "' width='",  widthHeight, "' height='", widthHeight, "'"));
 
@@ -72,7 +74,9 @@ library ArtBuilder {
 
         // polygon loop
         for (uint i = 0; i < tokenParams.shapeCount; i++) {
-            uint pointCount = Random.randomInt(tokenParams.randomSeed + i, 3, 5);
+            console.log('BEGINNING LOOP randomSeed: ');
+            console.log(randomSeed);
+            uint pointCount = Random.randomInt(randomSeed + i, 3, 5);
 
             // console.log('polygon: ' + i);
             // console.log('pointCount: ' + pointCount);
@@ -83,31 +87,46 @@ library ArtBuilder {
 
             // points loop
             for (uint j = 0; j < pointCount; j++) {
-                uint x1 = Random.randomInt(tokenParams.randomSeed + i + j + 40, 0, 1000);
+                uint x = Random.randomInt(randomSeed + i + j + 40, 0, 1000);
+                uint y = Random.randomInt(randomSeed + i + j + 50, 0, 1000);
                 points = string(abi.encodePacked(points, 
-                    StringUtils.uintToString(x1), 
+                    StringUtils.uintToString(x), 
                     ",", 
-                    Random.randomIntStr(tokenParams.randomSeed + i + j + 50, 0, 1000), 
+                    StringUtils.uintToString(y), 
                     " "));
 
-                if (x1 > maxX) {
-                    maxX = x1;
+                if (x > maxX) {
+                    maxX = x;
                 }
-                if (x1 < minX) {
-                    minX = x1;
+                if (x < minX) {
+                    minX = x;
                 }
             }
 
-            // string memory fillColour = getColour(randomSeed + i + 13, tint);
+            console.log("points");
+            console.log(i);
+            console.log(points);
+            
+            uint polygonOpacity;
+            uint midStopOpacity;
+
+            if (maxPolyRepeat < 4) {
+                polygonOpacity = Random.randomInt(randomSeed + i + 16, 80, 100);
+                midStopOpacity = Random.randomInt(randomSeed + i + 20, 40, 90);
+            } else {
+                polygonOpacity = Random.randomInt(randomSeed + i + 16, 50, 80);
+                midStopOpacity = Random.randomInt(randomSeed + i + 20, 30, 90);
+            }
 
             // console.log(`gradientColour1: ${gradientColour1}`);
             // console.log(`gradientColour2: ${gradientColour2}`);
             // console.log(`gradientColour3: ${gradientColour3}`);
 
 
+
             // console.log('gradientRotation: ' + gradientRotation);
 
-            uint polygonCount = Random.randomInt(tokenParams.randomSeed + 17, 1, maxPolyRepeat);
+            uint polygonCount = Random.randomInt(randomSeed + 17, 1, maxPolyRepeat);
             string memory polygons = "";
             uint polyRotation = 0;
             uint polyRotationDelta = 360 / polygonCount; //randomIntFromInterval(randomSeed + 18, 10, 180);
@@ -120,48 +139,35 @@ library ArtBuilder {
                     ", 500, 500)' fill='url(#gradient", 
                     StringUtils.uintToString(i), 
                     ")' opacity='", 
-                    StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(tokenParams.randomSeed + i + 16, 80, 100) : Random.randomInt(tokenParams.randomSeed + i + 16, 50, 80)) / 100), 
-                    "' />"));
+                    StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(randomSeed + i + 16, 80, 100) : Random.randomInt(randomSeed + i + 16, 50, 80))), 
+                    "%' />"));
 
-                // polygons += `<polygon points="${points}" transform="rotate(${polyRotation}, 500, 500)" fill="url(#gradient${i})" opacity="${polygonOpacity}" />`;
                 polyRotation += polyRotationDelta;
             }
 
-            shapes = addShapes(shapes, i, tokenParams, maxPolyRepeat, polygons);
+            uint gradientRotation = Random.randomInt(randomSeed + i + 15, 0, 360);
 
-            randomSeed += 100;
-        }
-
-        return shapes;
-
-    }
-
-    function addShapes(string memory shapes, uint i, TokenParams memory tokenParams, uint maxPolyRepeat, string memory polygons) private pure returns (string memory) {
-
-            uint midStopOpacity;
-
-            if (maxPolyRepeat < 4) {
-                midStopOpacity = Random.randomInt(tokenParams.randomSeed + i + 20, 40, 90) / 100;
-            } else {
-                midStopOpacity = Random.randomInt(tokenParams.randomSeed + i + 20, 30, 90) / 100;
-            }
-
-            uint gradientRotation = Random.randomInt(tokenParams.randomSeed + i + 15, 0, 360);
-
-            return string(abi.encodePacked(shapes, 
+            shapes = string(abi.encodePacked(shapes, 
                 "<linearGradient id='gradient", StringUtils.uintToString(i), "' gradientTransform='rotate(", 
                 StringUtils.uintToString(gradientRotation), 
                 ")'>",
-                "<stop offset='0%' stop-color='", getColour(tokenParams.randomSeed + i + 13, tokenParams.tint), "'/>",
-                "<stop offset='50%' stop-color='", getColour(tokenParams.randomSeed + i + 14, tokenParams.tint), "' stop-opacity='", 
-                StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(tokenParams.randomSeed + i + 20, 40, 90) : Random.randomInt(tokenParams.randomSeed + i + 20, 30, 90)) / 100), 
-                "'/>",
-                "<stop offset='100%' stop-color='", getColour(tokenParams.randomSeed + i + 15, tokenParams.tint), "'/>",
+                "<stop offset='0%' stop-color='", getColour(randomSeed + i + 13, tokenParams.tint), "'/>",
+                "<stop offset='50%' stop-color='", getColour(randomSeed + i + 14, tokenParams.tint), "' stop-opacity='", 
+                StringUtils.uintToString(midStopOpacity), 
+                "%'/>",
+                "<stop offset='100%' stop-color='", getColour(randomSeed + i + 15, tokenParams.tint), "'/>",
                 "</linearGradient>",
                 polygons
             ));
 
+            console.log('randomSeed before incrementing: ');
+            console.log(randomSeed);
+            randomSeed += 100;
+            console.log('randomSeed after incrementing: ');
+            console.log(randomSeed);
+        }
 
+        return shapes;
 
     }
 
@@ -452,20 +458,20 @@ library ArtBuilder {
  
     function getTraits(TokenParams memory tokenParams) internal pure returns (string memory) {
 
-        if (!tokenParams.custom) {
-            return "";
+        // if (!tokenParams.custom) {
+        //     return "";
 
-        } else {
-            return "";
-        }
-        // return string(abi.encodePacked('"attributes": '
-        //     '[{"trait_type": "seed", "value": ', StringUtils.uintToString(seed), '},'
-        //     '{"trait_type": "stars", "value": "', getStarType(seed),'"},'
-        //     '{"trait_type": "planets", "value": ', StringUtils.uintToString(getPlanetCount(seed)), '},'
-        //     '{"trait_type": "mountains", "value": "', getMountainType(seed),'"},'
-        //     '{"trait_type": "water", "value": "', getWaterType(seed),'"},'
-        //     '{"trait_type": "clouds", "value": "', getCloudType(seed),'"}'
-        //     ']'));
+        // } else {
+        //     return "";
+        // }
+        return string(abi.encodePacked('"attributes": '
+            '[{"trait_type": "seed", "value": "', StringUtils.uintToString(tokenParams.randomSeed), '"},'
+            '{"trait_type": "shapes", "value": "', StringUtils.uintToString(tokenParams.shapeCount), '"},'
+            '{"trait_type": "zoom", "value": "', StringUtils.uintToString(tokenParams.zoom), '"},'
+            '{"trait_type": "cyclic", "value": "', tokenParams.cyclic ? "true" : "false",'"}'
+            // '{"trait_type": "water", "value": "', getWaterType(seed),'"},'
+            // '{"trait_type": "clouds", "value": "', getCloudType(seed),'"}'
+            ']'));
     }
 
     // function getStarType(uint seed) internal pure returns (string memory) {

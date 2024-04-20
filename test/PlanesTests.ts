@@ -130,6 +130,33 @@ describe("Planes", function () {
     });
   });
 
+  describe("Experiment", function () {
+    it("Should build planes", async function () {
+      const { contract, owner } = await loadFixture(deployPlanesFixture);
+
+      const amount = ethers.parseEther("0.01");
+      const overrides = { value: amount };
+
+      await contract.mintCustom(
+        2517930,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90,
+        false,
+        overrides
+      );
+
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+      console.log("DONE TEST");
+    });
+  });
+
   describe("Events", function () {
     //   it("Should emit an event on withdrawals", async function () {
     //     const { lock, unlockTime, lockedAmount } = await loadFixture(
