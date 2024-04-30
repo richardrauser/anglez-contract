@@ -10,10 +10,10 @@ struct Tint {
 
 struct TokenParams {
     uint24 randomSeed;
+    bool custom;
     uint8 zoom; // 0 - 100
     Tint tint;
     uint8 shapeCount; // 1 - 20
-    bool cyclic; // 25 - 250 
-    bool custom; // 25 - 250
+    bool cyclic;
 }
 

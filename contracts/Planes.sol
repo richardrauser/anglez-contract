@@ -82,7 +82,7 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
 
     function mintRandom(uint24 seed) public payable {
         // TODO: Error messages
-        require(msg.value >= randomMintPrice, "Insufficient funds");
+        require(msg.value >= randomMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
 
         // TODO: support multi random mints via array of seeds?
@@ -106,11 +106,11 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
         uint256 tokenId = _nextTokenId();
         _mint(msg.sender, 1);
         tokenParamsMapping[tokenId] = tokenParams;
-
+        usedRandomSeeds[seed] = true;
     }
 
     function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic) public payable {
-        require(msg.value >= customMintPrice, "Insufficient funds");
+        require(msg.value >= customMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
 
         TokenParams memory tokenParams = TokenParams({
@@ -132,7 +132,7 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
         _mint(msg.sender, 1);
 
         tokenParamsMapping[tokenId] = tokenParams;
-
+        usedRandomSeeds[seed] = true;
     }
     
         // Returning minted NFTs

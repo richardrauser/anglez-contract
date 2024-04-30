@@ -1,7 +1,4 @@
-import {
-  time,
-  loadFixture,
-} from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
@@ -11,12 +8,6 @@ describe("Planes", function () {
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployPlanesFixture() {
-    // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    // const ONE_GWEI = 1_000_000_000;
-
-    // const lockedAmount = ONE_GWEI;
-    // const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
-
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
 
@@ -53,9 +44,9 @@ describe("Planes", function () {
     //   // We don't use the fixture here because we want a different deployment
     //   const latestTime = await time.latest();
     //   const Lock = await ethers.getContractFactory("Lock");
-    //   await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-    //     "Unlock time should be in the future"
-    //   );
+    // await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
+    //   "Unlock time should be in the future"
+    // );
     // });
   });
 
@@ -75,7 +66,7 @@ describe("Planes", function () {
       const { contract } = await loadFixture(deployPlanesFixture);
 
       const mintResult = await contract.mintCustom(
-        0,
+        1,
         4,
         100,
         100,
@@ -89,6 +80,66 @@ describe("Planes", function () {
 
       console.log(tokenUri);
       expect(tokenUri).to.not.be.empty;
+    });
+
+    it("Should not mint custom with underpayment", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      await expect(
+        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
+          value: ethers.parseEther("0.009"),
+        })
+      ).to.be.revertedWith("Insufficient payment");
+    });
+
+    it("Should not mint custom same seed twice", async function () {
+      const { contract } = await loadFixture(deployPlanesFixture);
+
+      const mintResult = await contract.mintCustom(
+        1,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90,
+        false,
+        { value: ethers.parseEther("0.01") }
+      );
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+
+      await expect(
+        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
+          value: ethers.parseEther("0.01"),
+        })
+      ).to.be.revertedWith("Seed already used");
+    });
+
+    it("Should not mint random same seed twice", async function () {
+      // TODO
+      // const { contract } = await loadFixture(deployPlanesFixture);
+      // const mintResult = await contract.mintCustom(
+      //   1,
+      //   4,
+      //   100,
+      //   100,
+      //   100,
+      //   100,
+      //   90,
+      //   false,
+      //   { value: ethers.parseEther("0.01") }
+      // );
+      // const tokenUri = await contract.tokenURI(0);
+      // console.log(tokenUri);
+      // expect(tokenUri).to.not.be.empty;
+      // await expect(
+      //   contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
+      //     value: ethers.parseEther("0.01"),
+      //   })
+      // ).to.be.revertedWith("Seed already used");
     });
 
     it("Should set random mint price", async function () {
