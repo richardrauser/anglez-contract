@@ -10,7 +10,7 @@ import "./TokenParams.sol";
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract Planes is ERC721AQueryable, ERC2981, Ownable {
+contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     uint16 public constant TOKEN_LIMIT = 512;
     // uint public unlockTime;
     // address payable public owner;
@@ -158,8 +158,8 @@ contract Planes is ERC721AQueryable, ERC2981, Ownable {
         // TODO: Consider if base64 encoding is necessary.. which chain to use?
         // Base64 encode because OpenSea does not interpret data properly as plaintext served from Polygon
         return string(abi.encodePacked(
-            'data:application/json,{"name":"PLZ #',  StringUtils.uintToString(_tokenId), ': beautiful abstract planes",'
-                '"description": "Planez are colorful and silly. https://planez.xyz", ', 
+            'data:application/json,{"name":"AGLZ #',  StringUtils.uintToString(_tokenId), ': beautiful, colorful, abstract anglez",'
+                '"description": "Anglez is on-chain, generative NFT art - https://anglez.xyz", ', 
                 ArtBuilder.getTraits(tokenParamsMapping[_tokenId]), ', '
                 '"image": "data:image/svg+xml,', 
                 generateSvg(_tokenId), 

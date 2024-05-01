@@ -3,15 +3,15 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("Planes", function () {
+describe("anglez tests", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
-  async function deployPlanesFixture() {
+  async function deployAnglezFixture() {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
 
-    const Contract = await ethers.getContractFactory("Planes");
+    const Contract = await ethers.getContractFactory("Anglez");
     const contract = await Contract.deploy();
 
     return { contract, owner, otherAccount };
@@ -19,40 +19,19 @@ describe("Planes", function () {
 
   describe("Deployment", function () {
     it("Should deploy", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
-
-      // expect(await lock.unlockTime()).to.equal(unlockTime);
+      const { contract } = await loadFixture(deployAnglezFixture);
     });
 
     it("Should set the right owner", async function () {
-      const { contract, owner } = await loadFixture(deployPlanesFixture);
+      const { contract, owner } = await loadFixture(deployAnglezFixture);
 
       expect(await contract.owner()).to.equal(owner.address);
     });
-
-    // it("Should receive and store the funds to lock", async function () {
-    //   const { lock, lockedAmount } = await loadFixture(
-    //     deployPlanesFixture
-    //   );
-
-    //   expect(await ethers.provider.getBalance(lock.target)).to.equal(
-    //     lockedAmount
-    //   );
-    // });
-
-    // it("Should fail if the unlockTime is not in the future", async function () {
-    //   // We don't use the fixture here because we want a different deployment
-    //   const latestTime = await time.latest();
-    //   const Lock = await ethers.getContractFactory("Lock");
-    // await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-    //   "Unlock time should be in the future"
-    // );
-    // });
   });
 
   describe("Minting", function () {
     it("Should mint random", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       const mintResult = await contract.mintRandom(0);
       const tokenUri = await contract.tokenURI(0);
@@ -63,7 +42,7 @@ describe("Planes", function () {
     });
 
     it("Should mint custom", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       const mintResult = await contract.mintCustom(
         1,
@@ -83,7 +62,7 @@ describe("Planes", function () {
     });
 
     it("Should not mint custom with underpayment", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       await expect(
         contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
@@ -93,7 +72,7 @@ describe("Planes", function () {
     });
 
     it("Should not mint custom same seed twice", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       const mintResult = await contract.mintCustom(
         1,
@@ -120,7 +99,7 @@ describe("Planes", function () {
 
     it("Should not mint random same seed twice", async function () {
       // TODO
-      // const { contract } = await loadFixture(deployPlanesFixture);
+      // const { contract } = await loadFixture(deployAnglezFixture);
       // const mintResult = await contract.mintCustom(
       //   1,
       //   4,
@@ -143,7 +122,7 @@ describe("Planes", function () {
     });
 
     it("Should set random mint price", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       const mintResult = await contract.setRandomMintPrice(
         ethers.parseEther("0.1")
@@ -154,7 +133,7 @@ describe("Planes", function () {
     });
 
     it("Should set custom mint price", async function () {
-      const { contract } = await loadFixture(deployPlanesFixture);
+      const { contract } = await loadFixture(deployAnglezFixture);
 
       const mintResult = await contract.setCustomMintPrice(
         ethers.parseEther("0.2")
@@ -167,7 +146,7 @@ describe("Planes", function () {
 
   describe("Withdrawals", function () {
     it("Should transfer the funds to the owner", async function () {
-      const { contract, owner } = await loadFixture(deployPlanesFixture);
+      const { contract, owner } = await loadFixture(deployAnglezFixture);
 
       const amount = ethers.parseEther("0.01");
       const overrides = { value: amount };
@@ -182,8 +161,8 @@ describe("Planes", function () {
   });
 
   describe("Experiment", function () {
-    it("Should build planes", async function () {
-      const { contract, owner } = await loadFixture(deployPlanesFixture);
+    it("Should build anglez", async function () {
+      const { contract, owner } = await loadFixture(deployAnglezFixture);
 
       const amount = ethers.parseEther("0.01");
       const overrides = { value: amount };
