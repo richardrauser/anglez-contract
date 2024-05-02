@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./ArtBuilder.sol";
 import "./TokenParams.sol";
+import "./Random.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
@@ -83,23 +84,37 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     function mintRandom(uint24 seed) public payable {
         // TODO: Error messages
         require(msg.value >= randomMintPrice, "Insufficient payment");
-        require(!usedRandomSeeds[seed], "Seed already used");
+        // require(!usedRandomSeeds[seed], "Seed already used");
 
         // TODO: support multi random mints via array of seeds?
+        console.log("Minting with seed: ");
+        console.log(seed);
+        uint8 zoom = Random.randomInt8(seed + 3, 50, 100);
+        console.log("Minting with zoom: ");
+        console.log(zoom);
+        
+        uint8 shapeCount = Random.randomInt8(seed + 5, 5, 8);
+
+        uint8 red = Random.randomInt8(seed + 6, 0, 255);
+        uint8 green = Random.randomInt8(seed + 7, 0, 255);
+        uint8 blue = Random.randomInt8(seed + 8, 0, 255);
+        uint alpha =  Random.randomInt (seed + 9, 10, 90) * 255 / 100;
+        uint8 alpha8 = uint8(alpha);
+        bool isCyclic = Random.randomInt(seed + 4, 0, 1) == 1;
 
         Tint memory tint = Tint({
-            red: 0,
-            green: 0,
-            blue: 0,
-            alpha: 0
+            red: red,
+            green: green,
+            blue: blue,
+            alpha: alpha8
         });
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
-            zoom: 0,
+            zoom: zoom,
             tint: tint,
-            shapeCount: 0,
-            cyclic: false,
+            shapeCount: shapeCount,
+            cyclic: isCyclic,
             custom: false
         }); 
 
@@ -111,7 +126,9 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
     function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic) public payable {
         require(msg.value >= customMintPrice, "Insufficient payment");
-        require(!usedRandomSeeds[seed], "Seed already used");
+        // require(!usedRandomSeeds[seed], "Seed already used");
+        require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
+        require(zoom >= 50 && zoom <= 100, "Invalid zoom");
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,

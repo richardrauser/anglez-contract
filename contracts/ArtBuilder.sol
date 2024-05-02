@@ -188,7 +188,7 @@ library ArtBuilder {
             '{"trait_type": "seed", "value": "', StringUtils.uintToString(tokenParams.randomSeed), '"},',
             '{"trait_type": "custom", "value": "', (tokenParams.custom) ? "true" : "false", '"},',
             '{"trait_type": "shapes", "value": "', StringUtils.uintToString(tokenParams.shapeCount), '"},',
-            '{"trait_type": "zoom", "value": "', StringUtils.uintToString(tokenParams.zoom), '"},',
+            '{"trait_type": "zoom", "value": "', StringUtils.uintToString(tokenParams.zoom), '%"},',
             '{"trait_type": "tint color", "value": "rgb(', StringUtils.uintToString(tokenParams.tint.red), ', ', StringUtils.uintToString(tokenParams.tint.green), ', ', StringUtils.uintToString(tokenParams.tint.blue), ')"},',
             '{"trait_type": "tint transparency", "value": "', StringUtils.uintToString(tintAlpha), '%"},',
             '{"trait_type": "cyclic", "value": "', tokenParams.cyclic ? "true" : "false",'"}',

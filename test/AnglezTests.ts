@@ -33,7 +33,7 @@ describe("anglez tests", function () {
     it("Should mint random", async function () {
       const { contract } = await loadFixture(deployAnglezFixture);
 
-      const mintResult = await contract.mintRandom(0);
+      const mintResult = await contract.mintRandom(3479128);
       const tokenUri = await contract.tokenURI(0);
 
       console.log(tokenUri);
