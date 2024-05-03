@@ -84,7 +84,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     function mintRandom(uint24 seed) public payable {
         // TODO: Error messages
         require(msg.value >= randomMintPrice, "Insufficient payment");
-        // require(!usedRandomSeeds[seed], "Seed already used");
+        require(!usedRandomSeeds[seed], "Seed already used");
 
         // TODO: support multi random mints via array of seeds?
         console.log("Minting with seed: ");
@@ -126,7 +126,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
     function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic) public payable {
         require(msg.value >= customMintPrice, "Insufficient payment");
-        // require(!usedRandomSeeds[seed], "Seed already used");
+        require(!usedRandomSeeds[seed], "Seed already used");
         require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
         require(zoom >= 50 && zoom <= 100, "Invalid zoom");
 

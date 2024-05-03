@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+require("dotenv").config();
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -16,10 +17,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
     },
-    // ropsten: {
-    //   url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-    //   accounts: [`0x${process.env.ROPSTEN_PRIVATE_KEY}`],
-    // },
+    sepolia: {
+      url: `${process.env.ALCHEMY_SEPOLIA_URL}`,
+      accounts: [`0x${process.env.WALLET_PRIVATE_KEY}`],
+    },
     // rinkeby: {
     //   url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
     //   accounts: [`0x${process.env.RINKEBY_PRIVATE_KEY}`, ``],
@@ -39,12 +40,13 @@ const config: HardhatUserConfig = {
     //     // gasPrice: 8000000000, // default is 'auto' which breaks chains without the london hardfork
     //   },
   },
-  // etherscan: {
-  //   apiKey: {
-  //     polygon: process.env.POLYGONSCAN_API_KEY,
-  //     polygonMumbai: process.env.POLYGONSCAN_API_KEY,
-  //   },
-  // },
+  etherscan: {
+    apiKey: {
+      sepolia: process.env.ETHERSCAN_API_KEY,
+      // polygon: process.env.POLYGONSCAN_API_KEY,
+      // polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+    },
+  },
 };
 
 export default config;
