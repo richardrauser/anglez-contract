@@ -15,5 +15,6 @@ struct TokenParams {
     Tint tint;
     uint8 shapeCount; // 1 - 20
     bool cyclic;
+    bool chaotic;
 }
 

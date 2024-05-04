@@ -77,7 +77,7 @@ library ArtBuilder {
         for (uint i = 0; i < tokenParams.shapeCount; i++) {
             console.log('BEGINNING LOOP randomSeed: ');
             console.log(randomSeed);
-            uint pointCount = Random.randomInt(randomSeed + i, 3, 5);
+            uint pointCount = Random.randomInt(randomSeed + i, 3, 4);
 
             // console.log('polygon: ' + i);
             // console.log('pointCount: ' + pointCount);
@@ -127,7 +127,7 @@ library ArtBuilder {
 
             // console.log('gradientRotation: ' + gradientRotation);
 
-            uint polygonCount = Random.randomInt(randomSeed + 17, 1, maxPolyRepeat);
+            uint polygonCount = maxPolyRepeat == 1 ? 1 : Random.randomInt(randomSeed + 17, 2, maxPolyRepeat);
             string memory polygons = "";
             uint polyRotation = 0;
             uint polyRotationDelta = 360 / polygonCount; //randomIntFromInterval(randomSeed + 18, 10, 180);
@@ -163,7 +163,9 @@ library ArtBuilder {
 
             console.log('randomSeed before incrementing: ');
             console.log(randomSeed);
-            randomSeed += 100;
+            if (tokenParams.chaotic) {
+                randomSeed += 100;
+            }
             console.log('randomSeed after incrementing: ');
             console.log(randomSeed);
         }
@@ -192,7 +194,8 @@ library ArtBuilder {
             '{"trait_type": "zoom", "value": "', StringUtils.uintToString(tokenParams.zoom), ' %"},',
             '{"trait_type": "tint color", "value": "rgb(', StringUtils.uintToString(tokenParams.tint.red), ', ', StringUtils.uintToString(tokenParams.tint.green), ', ', StringUtils.uintToString(tokenParams.tint.blue), ')"},',
             '{"trait_type": "tint transparency", "value": "', StringUtils.uintToString(tintAlpha), ' %"},',
-            '{"trait_type": "cyclic", "value": "', tokenParams.cyclic ? "true" : "false",'"}',
+            '{"trait_type": "style", "value": "', tokenParams.cyclic ? "cyclic" : "linear",'"},',
+            '{"trait_type": "structure", "value": "', tokenParams.chaotic ? "chaotic" : "folded",'"}',
             ']'));
     }
 }

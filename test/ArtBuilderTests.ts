@@ -30,6 +30,7 @@ describe("Traits", function () {
       },
       shapeCount: 4,
       cyclic: false,
+      chaotic: true,
       custom: true,
     };
 
@@ -59,15 +60,20 @@ describe("Traits", function () {
       (attribute) => attribute.trait_type == "custom"
     )[0]?.value;
 
-    const cyclic = traitsJson.attributes.filter(
-      (attribute) => attribute.trait_type == "cyclic"
+    const style = traitsJson.attributes.filter(
+      (attribute) => attribute.trait_type == "style"
+    )[0]?.value;
+
+    const structure = traitsJson.attributes.filter(
+      (attribute) => attribute.trait_type == "structure"
     )[0]?.value;
 
     expect(seed).to.equal("1234");
-    expect(zoom).to.equal("140");
+    expect(zoom).to.equal("140 %");
     expect(tintColor).to.equal("rgb(100, 101, 102)");
-    expect(tintAlpha).to.equal("19%");
-    expect(cyclic).to.equal("false");
+    expect(tintAlpha).to.equal("19 %");
+    expect(style).to.equal("linear");
+    expect(structure).to.equal("chaotic");
     expect(custom).to.equal("true");
   });
 

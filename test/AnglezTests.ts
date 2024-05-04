@@ -53,6 +53,7 @@ describe("anglez tests", function () {
         100,
         90,
         false,
+        false,
         { value: ethers.parseEther("0.01") }
       );
       const tokenUri = await contract.tokenURI(0);
@@ -61,11 +62,87 @@ describe("anglez tests", function () {
       expect(tokenUri).to.not.be.empty;
     });
 
+    it("Should validate custom params", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      const mintResult = await contract.validateCustomParams(
+        1,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90
+      );
+
+      expect(mintResult).to.equal(true);
+
+      const mintResult2 = await contract.validateCustomParams(
+        1,
+        1,
+        100,
+        100,
+        100,
+        100,
+        90
+      );
+
+      expect(mintResult2).to.equal(false);
+
+      const mintResult3 = await contract.validateCustomParams(
+        1,
+        21,
+        100,
+        100,
+        100,
+        100,
+        90
+      );
+
+      expect(mintResult3).to.equal(false);
+
+      const mintResult4 = await contract.validateCustomParams(
+        1,
+        4,
+        49,
+        100,
+        100,
+        100,
+        90
+      );
+
+      expect(mintResult4).to.equal(false);
+
+      const mintResult5 = await contract.validateCustomParams(
+        1,
+        4,
+        101,
+        100,
+        100,
+        100,
+        90
+      );
+
+      expect(mintResult5).to.equal(false);
+
+      // const mintResult6 = await contract.validateCustomParams(
+      //   1,
+      //   4,
+      //   101,
+      //   256,
+      //   100,
+      //   100,
+      //   90
+      // );
+
+      // expect(mintResult6).to.equal(false);
+    });
+
     it("Should not mint custom with underpayment", async function () {
       const { contract } = await loadFixture(deployAnglezFixture);
 
       await expect(
-        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
+        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, false, {
           value: ethers.parseEther("0.009"),
         })
       ).to.be.revertedWith("Insufficient payment");
@@ -83,6 +160,7 @@ describe("anglez tests", function () {
         100,
         90,
         false,
+        false,
         { value: ethers.parseEther("0.01") }
       );
       const tokenUri = await contract.tokenURI(0);
@@ -91,10 +169,32 @@ describe("anglez tests", function () {
       expect(tokenUri).to.not.be.empty;
 
       await expect(
-        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
+        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, false, {
           value: ethers.parseEther("0.01"),
         })
       ).to.be.revertedWith("Seed already used");
+    });
+
+    it("isMinted returns correctly", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      const mintResult = await contract.mintCustom(
+        1,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90,
+        false,
+        false,
+        { value: ethers.parseEther("0.01") }
+      );
+      const isMinted1 = await contract.isSeedMinted(1);
+      const isMinted2 = await contract.isSeedMinted(2);
+
+      expect(isMinted1).to.equal(true);
+      expect(isMinted2).to.equal(false);
     });
 
     it("Should not mint random same seed twice", async function () {
@@ -151,7 +251,18 @@ describe("anglez tests", function () {
       const amount = ethers.parseEther("0.01");
       const overrides = { value: amount };
 
-      await contract.mintCustom(0, 4, 100, 100, 100, 100, 90, false, overrides);
+      await contract.mintCustom(
+        0,
+        4,
+        100,
+        100,
+        100,
+        100,
+        90,
+        false,
+        false,
+        overrides
+      );
 
       await expect(contract.withdraw()).to.changeEtherBalances(
         [owner, contract],
@@ -175,6 +286,7 @@ describe("anglez tests", function () {
         100,
         100,
         90,
+        false,
         false,
         overrides
       );

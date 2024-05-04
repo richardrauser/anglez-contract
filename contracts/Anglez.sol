@@ -101,6 +101,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         uint alpha =  Random.randomInt (seed + 9, 10, 90) * 255 / 100;
         uint8 alpha8 = uint8(alpha);
         bool isCyclic = Random.randomInt(seed + 4, 0, 1) == 1;
+        bool isChaotic = Random.randomInt(seed + 11, 0, 1) == 1;
 
         Tint memory tint = Tint({
             red: red,
@@ -115,7 +116,8 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
             tint: tint,
             shapeCount: shapeCount,
             cyclic: isCyclic,
-            custom: false
+            custom: false,
+            chaotic: isChaotic
         }); 
 
         uint256 tokenId = _nextTokenId();
@@ -124,11 +126,43 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         usedRandomSeeds[seed] = true;
     }
 
-    function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic) public payable {
+    function validateCustomParams(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha) public view returns (bool) {
+
+        if (usedRandomSeeds[seed]) {
+            console.log("Seed already used");
+            return false;
+        }
+        if (shapeCount < 2 || shapeCount > 20) {
+            return false;
+        }
+        if (zoom < 50 || zoom > 100) {
+            return false;
+        }
+        if (tintRed < 0 || tintRed > 255) {
+            return false;
+        }
+        if (tintGreen < 0 || tintGreen > 255) {
+            return false;
+        }
+        if (tintBlue < 0 || tintBlue > 255) {
+            return false;
+        }
+        if (tintAlpha < 0 || tintAlpha > 255) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic, bool isChaotic) public payable {
         require(msg.value >= customMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
         require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
         require(zoom >= 50 && zoom <= 100, "Invalid zoom");
+        require(tintRed >= 0 && tintRed <= 255, "Invalid red tint");
+        require(tintGreen >= 0 && tintGreen <= 255, "Invalid green tint");
+        require(tintBlue >= 0 && tintBlue <= 255, "Invalid blue tint");
+        require(tintAlpha >= 0 && tintAlpha <= 255, "Invalid alpha tint");
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
@@ -141,7 +175,8 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
             }),
             shapeCount: shapeCount,
             cyclic: isCyclic,
-            custom: true
+            custom: true,
+            chaotic: isChaotic
         }); 
 
         uint256 tokenId = _nextTokenId();
@@ -157,17 +192,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     function isSeedMinted(uint24 seed) public view returns (bool) {
         return usedRandomSeeds[seed];
     }   
-
-    // function allMinted() public view returns (bool[] memory) {
-    //     bool[] memory minted = new bool[](TOKEN_LIMIT + 1);
-    //     minted[0] = false;
-    //     for (uint i = 1; i <= TOKEN_LIMIT; i++) {
-    //         minted[i] = _mintedNumbers[i];
-    //     }
-        
-    //     return minted;
-    // }   
-
 
     function tokenURI(uint256 _tokenId) public view override(ERC721A, IERC721A) returns (string memory) {
         require(_exists(_tokenId), "BAD_ID");
