@@ -21,13 +21,6 @@ library ArtBuilder {
     }
     
     function build(TokenParams memory tokenParams) internal pure returns (string memory) {
-
-        if (!tokenParams.custom) {
-            // TODO: randomize params
-
-        }
-        
-
         uint maxPolyRepeat;
 
         if (tokenParams.cyclic) {
@@ -35,7 +28,6 @@ library ArtBuilder {
         } else {
             maxPolyRepeat = 1;
         }
-
 
         (string memory shapes, string memory viewBox) = getShapes(tokenParams, maxPolyRepeat);
         return string(abi.encodePacked("<svg xmlns='http://www.w3.org/2000/svg' viewBox='", 

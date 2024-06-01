@@ -16,7 +16,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     // uint public unlockTime;
     // address payable public owner;
     uint256 private randomMintPrice = 0 ether;
-    // TODO: set price other than 0
     uint256 private customMintPrice = 0.01 ether;
     //tokensarray
     mapping(uint256 => TokenParams) private tokenParamsMapping;
