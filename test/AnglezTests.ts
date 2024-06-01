@@ -50,7 +50,6 @@ describe("anglez tests", function () {
         100,
         100,
         100,
-        100,
         90,
         false,
         false,
@@ -71,7 +70,6 @@ describe("anglez tests", function () {
         100,
         100,
         100,
-        100,
         90
       );
 
@@ -80,7 +78,6 @@ describe("anglez tests", function () {
       const mintResult2 = await contract.validateCustomParams(
         1,
         1,
-        100,
         100,
         100,
         100,
@@ -95,35 +92,10 @@ describe("anglez tests", function () {
         100,
         100,
         100,
-        100,
         90
       );
 
       expect(mintResult3).to.equal(false);
-
-      const mintResult4 = await contract.validateCustomParams(
-        1,
-        4,
-        49,
-        100,
-        100,
-        100,
-        90
-      );
-
-      expect(mintResult4).to.equal(false);
-
-      const mintResult5 = await contract.validateCustomParams(
-        1,
-        4,
-        101,
-        100,
-        100,
-        100,
-        90
-      );
-
-      expect(mintResult5).to.equal(false);
 
       // const mintResult6 = await contract.validateCustomParams(
       //   1,
@@ -142,7 +114,7 @@ describe("anglez tests", function () {
       const { contract } = await loadFixture(deployAnglezFixture);
 
       await expect(
-        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, false, {
+        contract.mintCustom(1, 4, 100, 100, 100, 90, false, false, {
           value: ethers.parseEther("0.009"),
         })
       ).to.be.revertedWith("Insufficient payment");
@@ -157,7 +129,6 @@ describe("anglez tests", function () {
         100,
         100,
         100,
-        100,
         90,
         false,
         false,
@@ -169,7 +140,7 @@ describe("anglez tests", function () {
       expect(tokenUri).to.not.be.empty;
 
       await expect(
-        contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, false, {
+        contract.mintCustom(1, 4, 100, 100, 100, 90, false, false, {
           value: ethers.parseEther("0.01"),
         })
       ).to.be.revertedWith("Seed already used");
@@ -181,7 +152,6 @@ describe("anglez tests", function () {
       const mintResult = await contract.mintCustom(
         1,
         4,
-        100,
         100,
         100,
         100,
@@ -257,7 +227,6 @@ describe("anglez tests", function () {
         100,
         100,
         100,
-        100,
         90,
         false,
         false,
@@ -281,7 +250,6 @@ describe("anglez tests", function () {
       await contract.mintCustom(
         2517930,
         4,
-        100,
         100,
         100,
         100,

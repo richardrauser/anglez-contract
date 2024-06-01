@@ -13,6 +13,9 @@ const config: HardhatUserConfig = {
       viaIR: true,
     },
   },
+  // sourcify: {
+  //   enabled: true,
+  // },
   networks: {
     hardhat: {
       chainId: 1337,
@@ -42,7 +45,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY,
+      sepolia: "U68IY6DYDAPQ99Z34E3HYG9K4F97I1ETK7",
       // polygon: process.env.POLYGONSCAN_API_KEY,
       // polygonMumbai: process.env.POLYGONSCAN_API_KEY,
     },

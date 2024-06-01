@@ -9,4 +9,8 @@ contract TestArtBuilder {
       return ArtBuilder.getTraits(tokenParams);
     }
 
+    function _sqrt(uint x) public pure returns (uint) {
+        return ArtBuilder.sqrt(x);
+    }
+
 }

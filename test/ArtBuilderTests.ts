@@ -21,7 +21,6 @@ describe("Traits", function () {
 
     const tokenParams = {
       randomSeed: 1234,
-      zoom: 140,
       tint: {
         red: 100,
         green: 101,
@@ -42,10 +41,6 @@ describe("Traits", function () {
 
     const seed = traitsJson.attributes.filter(
       (attribute) => attribute.trait_type == "seed"
-    )[0]?.value;
-
-    const zoom = traitsJson.attributes.filter(
-      (attribute) => attribute.trait_type == "zoom"
     )[0]?.value;
 
     const tintColor = traitsJson.attributes.filter(
@@ -69,7 +64,6 @@ describe("Traits", function () {
     )[0]?.value;
 
     expect(seed).to.equal("1234");
-    expect(zoom).to.equal("140 %");
     expect(tintColor).to.equal("rgb(100, 101, 102)");
     expect(tintAlpha).to.equal("19 %");
     expect(style).to.equal("linear");
@@ -80,5 +74,12 @@ describe("Traits", function () {
   it("Should set the right owner", async function () {
     // const { contract, owner } = await loadFixture(deployArtBuilderFixture);
     // expect(await contract.owner()).to.equal(owner.address);
+  });
+
+  it("Should calculate square roots correctly", async function () {
+    const { contract, owner } = await loadFixture(deployArtBuilderFixture);
+    expect(await contract._sqrt(4)).to.equal(2);
+    expect(await contract._sqrt(100)).to.equal(10);
+    expect(await contract._sqrt(141)).to.equal(11);
   });
 });

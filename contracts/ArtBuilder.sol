@@ -6,6 +6,7 @@ import "./StringUtils.sol";
 import "./Random.sol";
 import "./TokenParams.sol";
 import "./ColourWork.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "hardhat/console.sol";
 
@@ -27,9 +28,6 @@ library ArtBuilder {
         }
         
 
-        (string memory viewBox, string memory clipRect) = getViewBoxClipRect(150 - tokenParams.zoom);
-        string memory defs = string(abi.encodePacked("<defs><clipPath id='masterClip'><rect ", clipRect, "/></clipPath></defs>"));
-
         uint maxPolyRepeat;
 
         if (tokenParams.cyclic) {
@@ -39,37 +37,20 @@ library ArtBuilder {
         }
 
 
-        string memory shapes = getShapes(tokenParams, maxPolyRepeat);
+        (string memory shapes, string memory viewBox) = getShapes(tokenParams, maxPolyRepeat);
         return string(abi.encodePacked("<svg xmlns='http://www.w3.org/2000/svg' viewBox='", 
             viewBox, "'>", 
-            defs, "<g clip-path='url(#masterClip)'>", shapes, "</g></svg>"));
+            shapes, "</svg>"));
     }
 
-
-    function getViewBoxClipRect(uint zoom) private pure returns (string memory, string memory) {
-        zoom = zoom * 10;
-        string memory widthHeight = StringUtils.uintToString(500 + zoom);
-
-        if (zoom > 500) {
-            string memory offset = StringUtils.uintToString((zoom - 500) / 2);
-            string memory viewBox = string(abi.encodePacked("-", offset, " -", offset, " ",  widthHeight, " ", widthHeight));
-            string memory clipRect = string(abi.encodePacked("x='-", offset, "' y='-", offset, "' width='",  widthHeight, "' height='", widthHeight, "'"));
-            return (viewBox, clipRect);
-        } else {
-            string memory offset = StringUtils.uintToString((zoom == 500 ? 0 : (500 - zoom) / 2));
-            string memory viewBox = string(abi.encodePacked(offset, " ", offset, " ",  widthHeight, " ", widthHeight));
-            string memory clipRect = string(abi.encodePacked("x='", offset, "' y='", offset, "' width='",  widthHeight, "' height='", widthHeight, "'"));
-
-            return (viewBox, clipRect);
-        }
-    }
-
-    function getShapes(TokenParams memory tokenParams, uint maxPolyRepeat) private pure returns (string memory) {
+    function getShapes(TokenParams memory tokenParams, uint maxPolyRepeat) private pure returns (string memory, string memory) {
         string memory shapes = "";
         // TODO: consider best max ( 5 15?)
         // console.log('_------- RANDOM SEED: ' + randomSeed);
         uint minX = 1000;
         uint maxX = 0;
+        uint minY = 1000;
+        uint maxY = 0;
 
         uint randomSeed = tokenParams.randomSeed;
 
@@ -101,6 +82,12 @@ library ArtBuilder {
                 }
                 if (x < minX) {
                     minX = x;
+                }
+                if (y < minY) {
+                    minY = y;
+                }
+                if (y > maxY) {
+                    maxY = y;
                 }
             }
 
@@ -170,8 +157,70 @@ library ArtBuilder {
             console.log(randomSeed);
         }
 
-        return shapes;
+        uint structureWidth = maxX - minX;
+        uint structureHeight = maxY - minY;
 
+        uint width;
+        uint height;
+        int xOffset;
+        int yOffset;
+
+        if (maxPolyRepeat == 1) {
+            width = structureWidth + 100;
+            xOffset = int(minX) - 50; // (1000 - width) / 2;
+            height = structureHeight + 100;
+            yOffset = int(minY) - 50;
+
+            // shapes += `
+            //   <rect x="${minX}" y="${minY}" width="${structureWidth}" height="${structureHeight}" fill="#f00" opacity="0.2"/>
+            // `;
+        } else {
+            uint margin = min(minX, 1000 - maxX, minY, 1000 - maxY) + 10;
+            uint artboardWidthHeight = 1000 - 2 * margin;
+
+            console.log('artboardWidthHeight!: ');
+            console.log(artboardWidthHeight);
+
+            uint temp = 2 * (artboardWidthHeight**2);
+            console.log('temp: ');
+            console.log(temp);
+            // so we always have an even number
+            uint widthHeight = (sqrt(temp) + 1) / 2 * 2;
+
+            console.log('widthHeight: ');
+            console.log(widthHeight);
+
+            int offset = (1000 - int(widthHeight)) / 2;
+
+            width = widthHeight;
+            xOffset = offset;
+            height = widthHeight;
+            yOffset = offset;
+        }
+
+        string memory viewBox = string(abi.encodePacked(Strings.toStringSigned(xOffset), ' ', Strings.toStringSigned(yOffset), ' ', StringUtils.uintToString(width), ' ', StringUtils.uintToString(height)));
+
+        return(shapes, viewBox);
+
+    }
+
+    function sqrt(uint x) internal pure returns (uint) {
+        uint z = (x + 1) / 2;
+        uint y = x;
+        while (z < y) {
+            y = z;
+            z = (x / z + z) / 2;
+        }
+
+      return y;
+        
+    }
+    function min(uint a, uint b, uint c, uint d) internal pure returns (uint) {
+        uint minVal = a < b ? a : b;
+        minVal = minVal < c ? minVal : c;
+        minVal = minVal < d ? minVal : d;
+
+        return minVal;
     }
 
     function getTraits(TokenParams memory tokenParams) internal pure returns (string memory) {
@@ -191,7 +240,6 @@ library ArtBuilder {
             '{"trait_type": "custom", "value": "', (tokenParams.custom) ? "true" : "false", '"},',
             '{"trait_type": "shapes", "value": "', StringUtils.uintToString(tokenParams.shapeCount), '"},',
              // TODO: ensure percentages show up properly in opensea
-            '{"trait_type": "zoom", "value": "', StringUtils.uintToString(tokenParams.zoom), ' %"},',
             '{"trait_type": "tint color", "value": "rgb(', StringUtils.uintToString(tokenParams.tint.red), ', ', StringUtils.uintToString(tokenParams.tint.green), ', ', StringUtils.uintToString(tokenParams.tint.blue), ')"},',
             '{"trait_type": "tint transparency", "value": "', StringUtils.uintToString(tintAlpha), ' %"},',
             '{"trait_type": "style", "value": "', tokenParams.cyclic ? "cyclic" : "linear",'"},',

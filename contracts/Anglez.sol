@@ -16,6 +16,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     // uint public unlockTime;
     // address payable public owner;
     uint256 private randomMintPrice = 0 ether;
+    // TODO: set price other than 0
     uint256 private customMintPrice = 0.01 ether;
     //tokensarray
     mapping(uint256 => TokenParams) private tokenParamsMapping;
@@ -89,9 +90,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         // TODO: support multi random mints via array of seeds?
         console.log("Minting with seed: ");
         console.log(seed);
-        uint8 zoom = Random.randomInt8(seed + 3, 50, 100);
-        console.log("Minting with zoom: ");
-        console.log(zoom);
         
         uint8 shapeCount = Random.randomInt8(seed + 5, 5, 8);
 
@@ -112,7 +110,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
-            zoom: zoom,
             tint: tint,
             shapeCount: shapeCount,
             cyclic: isCyclic,
@@ -126,16 +123,13 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         usedRandomSeeds[seed] = true;
     }
 
-    function validateCustomParams(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha) public view returns (bool) {
+    function validateCustomParams(uint24 seed, uint8 shapeCount, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha) public view returns (bool) {
 
         if (usedRandomSeeds[seed]) {
             console.log("Seed already used");
             return false;
         }
         if (shapeCount < 2 || shapeCount > 20) {
-            return false;
-        }
-        if (zoom < 50 || zoom > 100) {
             return false;
         }
         if (tintRed < 0 || tintRed > 255) {
@@ -154,11 +148,10 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         return true;
     }
 
-    function mintCustom(uint24 seed, uint8 shapeCount, uint8 zoom, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic, bool isChaotic) public payable {
+    function mintCustom(uint24 seed, uint8 shapeCount, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic, bool isChaotic) public payable {
         require(msg.value >= customMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
         require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
-        require(zoom >= 50 && zoom <= 100, "Invalid zoom");
         require(tintRed >= 0 && tintRed <= 255, "Invalid red tint");
         require(tintGreen >= 0 && tintGreen <= 255, "Invalid green tint");
         require(tintBlue >= 0 && tintBlue <= 255, "Invalid blue tint");
@@ -166,7 +159,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
-            zoom: zoom,
             tint: Tint({
                 red: tintRed,
                 green: tintGreen,
