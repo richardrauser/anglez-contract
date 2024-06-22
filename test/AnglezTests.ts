@@ -61,6 +61,49 @@ describe("anglez tests", function () {
       expect(tokenUri).to.not.be.empty;
     });
 
+    it("Should not mint random past TOKEN_LIMIT", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      for (let i = 0; i < 512; i++) {
+        await contract.mintRandom(i);
+      }
+      await expect(contract.mintRandom(3479128)).to.be.revertedWith(
+        "TOKEN_LIMIT_REACHED"
+      );
+    });
+
+    it("Should not mint custom past TOKEN_LIMIT", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      for (let i = 0; i < 512; i++) {
+        await contract.mintCustom(i, 4, 100, 100, 100, 90, false, false, {
+          value: ethers.parseEther("0.01"),
+        });
+      }
+      await expect(
+        contract.mintCustom(4566, 4, 100, 100, 100, 90, false, false, {
+          value: ethers.parseEther("0.01"),
+        })
+      ).to.be.revertedWith("TOKEN_LIMIT_REACHED");
+    });
+
+    it("Should not mint random + custom past TOKEN_LIMIT", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      for (let i = 0; i < 256; i++) {
+        await contract.mintRandom(i);
+      }
+      for (let i = 256; i < 512; i++) {
+        await contract.mintCustom(i, 4, 100, 100, 100, 90, false, false, {
+          value: ethers.parseEther("0.01"),
+        });
+      }
+
+      await expect(contract.mintRandom(3479128)).to.be.revertedWith(
+        "TOKEN_LIMIT_REACHED"
+      );
+    });
+
     it("Should validate custom params", async function () {
       const { contract } = await loadFixture(deployAnglezFixture);
 
@@ -120,6 +163,20 @@ describe("anglez tests", function () {
       ).to.be.revertedWith("Insufficient payment");
     });
 
+    it("Should not random same seed twice", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      await contract.mintRandom(3479128);
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+
+      await expect(contract.mintRandom(3479128)).to.be.revertedWith(
+        "Seed already used"
+      );
+    });
+
     it("Should not mint custom same seed twice", async function () {
       const { contract } = await loadFixture(deployAnglezFixture);
 
@@ -141,6 +198,46 @@ describe("anglez tests", function () {
 
       await expect(
         contract.mintCustom(1, 4, 100, 100, 100, 90, false, false, {
+          value: ethers.parseEther("0.01"),
+        })
+      ).to.be.revertedWith("Seed already used");
+    });
+
+    it("Should not mint custom + random same seed twice", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      const mintResult = await contract.mintCustom(
+        1234,
+        4,
+        100,
+        100,
+        100,
+        90,
+        false,
+        false,
+        { value: ethers.parseEther("0.01") }
+      );
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+
+      await expect(contract.mintRandom(1234)).to.be.revertedWith(
+        "Seed already used"
+      );
+    });
+
+    it("Should not mint random + custom same seed twice", async function () {
+      const { contract } = await loadFixture(deployAnglezFixture);
+
+      await contract.mintRandom(5678);
+      const tokenUri = await contract.tokenURI(0);
+
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+
+      await expect(
+        contract.mintCustom(5678, 4, 100, 100, 100, 90, false, false, {
           value: ethers.parseEther("0.01"),
         })
       ).to.be.revertedWith("Seed already used");
@@ -168,27 +265,26 @@ describe("anglez tests", function () {
     });
 
     it("Should not mint random same seed twice", async function () {
-      // TODO
-      // const { contract } = await loadFixture(deployAnglezFixture);
-      // const mintResult = await contract.mintCustom(
-      //   1,
-      //   4,
-      //   100,
-      //   100,
-      //   100,
-      //   100,
-      //   90,
-      //   false,
-      //   { value: ethers.parseEther("0.01") }
-      // );
-      // const tokenUri = await contract.tokenURI(0);
-      // console.log(tokenUri);
-      // expect(tokenUri).to.not.be.empty;
-      // await expect(
-      //   contract.mintCustom(1, 4, 100, 100, 100, 100, 90, false, {
-      //     value: ethers.parseEther("0.01"),
-      //   })
-      // ).to.be.revertedWith("Seed already used");
+      const { contract } = await loadFixture(deployAnglezFixture);
+      const mintResult = await contract.mintCustom(
+        1,
+        4,
+        100,
+        100,
+        100,
+        90,
+        false,
+        false,
+        { value: ethers.parseEther("0.01") }
+      );
+      const tokenUri = await contract.tokenURI(0);
+      console.log(tokenUri);
+      expect(tokenUri).to.not.be.empty;
+      await expect(
+        contract.mintCustom(1, 4, 100, 100, 100, 100, false, false, {
+          value: ethers.parseEther("0.01"),
+        })
+      ).to.be.revertedWith("Seed already used");
     });
 
     it("Should set random mint price", async function () {

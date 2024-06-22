@@ -83,6 +83,8 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
     function mintRandom(uint24 seed) public payable {
         // TODO: Error messages
+        uint256 tokenId = _nextTokenId();
+        require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
         require(msg.value >= randomMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
 
@@ -116,7 +118,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
             chaotic: isChaotic
         }); 
 
-        uint256 tokenId = _nextTokenId();
         _mint(msg.sender, 1);
         tokenParamsMapping[tokenId] = tokenParams;
         usedRandomSeeds[seed] = true;
@@ -128,6 +129,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
             console.log("Seed already used");
             return false;
         }
+        // TODO min shape count for linear should be higher?
         if (shapeCount < 2 || shapeCount > 20) {
             return false;
         }
@@ -148,6 +150,8 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     }
 
     function mintCustom(uint24 seed, uint8 shapeCount, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic, bool isChaotic) public payable {
+        uint256 tokenId = _nextTokenId();
+        require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
         require(msg.value >= customMintPrice, "Insufficient payment");
         require(!usedRandomSeeds[seed], "Seed already used");
         require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
@@ -169,9 +173,6 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
             custom: true,
             chaotic: isChaotic
         }); 
-
-        uint256 tokenId = _nextTokenId();
-
         _mint(msg.sender, 1);
 
         tokenParamsMapping[tokenId] = tokenParams;
@@ -200,7 +201,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     }
 
     function generateSvg(uint256 _tokenId) public view returns (string memory) {
-        require(_exists(_tokenId) && _tokenId < TOKEN_LIMIT, "BAD_ID");
+        require(_exists(_tokenId), "BAD_ID");
         return ArtBuilder.build(tokenParamsMapping[_tokenId]);
     }    
 

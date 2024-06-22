@@ -217,15 +217,7 @@ library ArtBuilder {
 
     function getTraits(TokenParams memory tokenParams) internal pure returns (string memory) {
 
-        // if (!tokenParams.custom) {
-        //     return "";
-
-        // } else {
-        //     return "";
-        // }
-
         uint tintAlpha = uint(tokenParams.tint.alpha) * 100 / 255;
-
 
         return string(abi.encodePacked('"attributes": [',
             '{"trait_type": "seed", "value": "', StringUtils.uintToString(tokenParams.randomSeed), '"},',
