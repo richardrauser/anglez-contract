@@ -132,9 +132,9 @@ library ArtBuilder {
                 StringUtils.uintToString(gradientRotation), 
                 ")'>",
                 "<stop offset='0%' stop-color='", getColour(randomSeed + i + 13, tokenParams.tint), "'/>",
-                "<stop offset='50%' stop-color='", getColour(randomSeed + i + 14, tokenParams.tint), "' stop-opacity='", 
+                "<stop offset='50%' stop-color='", getColour(randomSeed + i + 14, tokenParams.tint), "' stop-opacity='0.", 
                 StringUtils.uintToString(midStopOpacity), 
-                "%'/>",
+                "'/>",
                 "<stop offset='100%' stop-color='", getColour(randomSeed + i + 15, tokenParams.tint), "'/>",
                 "</linearGradient>",
                 polygons

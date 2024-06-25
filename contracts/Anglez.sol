@@ -21,14 +21,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     mapping(uint256 => TokenParams) private tokenParamsMapping;
     mapping(uint24 => bool) private usedRandomSeeds;
 
-    constructor() ERC721A("Anglez", "AGLZ") Ownable(msg.sender) {
-            // require(
-        //     block.timestamp < _unlockTime,
-        //     "Unlock time should be in the future"
-        // );
-
-        // unlockTime = _unlockTime;
-        // owner = payable(msg.sender);
+    constructor() ERC721A("Anglez", "NGLZ") Ownable(msg.sender) {
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -60,7 +53,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     // For OpenSea
 
     function contractURI() public pure returns (string memory) {
-        return "https://mint.beyondhuman.ai/storefront-metadata";
+        return "https://www.anglez.xyz/storefront-metadata";
     }
 
     // Minting
@@ -85,8 +78,8 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         // TODO: Error messages
         uint256 tokenId = _nextTokenId();
         require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
-        require(msg.value >= randomMintPrice, "Insufficient payment");
-        require(!usedRandomSeeds[seed], "Seed already used");
+        require(msg.value >= randomMintPrice, "INSUFFICIENT_PAYMENT");
+        require(!usedRandomSeeds[seed], "SEED_USED");
 
         // TODO: support multi random mints via array of seeds?
         console.log("Minting with seed: ");
@@ -152,13 +145,13 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     function mintCustom(uint24 seed, uint8 shapeCount, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha, bool isCyclic, bool isChaotic) public payable {
         uint256 tokenId = _nextTokenId();
         require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
-        require(msg.value >= customMintPrice, "Insufficient payment");
-        require(!usedRandomSeeds[seed], "Seed already used");
-        require(shapeCount >= 2 && shapeCount <= 20, "Invalid shape count");
-        require(tintRed >= 0 && tintRed <= 255, "Invalid red tint");
-        require(tintGreen >= 0 && tintGreen <= 255, "Invalid green tint");
-        require(tintBlue >= 0 && tintBlue <= 255, "Invalid blue tint");
-        require(tintAlpha >= 0 && tintAlpha <= 255, "Invalid alpha tint");
+        require(msg.value >= customMintPrice, "INSUFFICIENT_PAYMENT");
+        require(!usedRandomSeeds[seed], "SEED_USED");
+        require(shapeCount >= 2 && shapeCount <= 20, "INVALID_SHAPE_COUNT");
+        require(tintRed >= 0 && tintRed <= 255, "INVALID_TINT_RED");
+        require(tintGreen >= 0 && tintGreen <= 255, "INVALID_TINT_GREEN");
+        require(tintBlue >= 0 && tintBlue <= 255, "IVALID_TINT_BLUE");
+        require(tintAlpha >= 0 && tintAlpha <= 255, "INVALID_TINT_ALPHA");
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
@@ -191,7 +184,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         // TODO: Consider if base64 encoding is necessary.. which chain to use?
         // Base64 encode because OpenSea does not interpret data properly as plaintext served from Polygon
         return string(abi.encodePacked(
-            'data:application/json,{"name":"AGLZ #',  StringUtils.uintToString(_tokenId), ': beautiful, colorful, abstract anglez",'
+            'data:application/json,{"name":"NGLZ #',  StringUtils.uintToString(_tokenId), ': beautiful, colorful, abstract anglez",'
                 '"description": "Anglez is on-chain, generative NFT art - https://anglez.xyz", ', 
                 ArtBuilder.getTraits(tokenParamsMapping[_tokenId]), ', '
                 '"image": "data:image/svg+xml,', 
