@@ -20,6 +20,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
     },
+    baseSepolia: {
+      url: `${process.env.COINBASE_BASE_SEPOLIA_URL}`,
+      accounts: [`0x${process.env.WALLET_PRIVATE_KEY}`],
+    },
     sepolia: {
       url: `${process.env.ALCHEMY_SEPOLIA_URL}`,
       accounts: [`0x${process.env.WALLET_PRIVATE_KEY}`],

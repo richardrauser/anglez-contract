@@ -118,9 +118,9 @@ library ArtBuilder {
                     StringUtils.uintToString(polyRotation), 
                     ", 500, 500)' fill='url(#gradient", 
                     StringUtils.uintToString(i), 
-                    ")' opacity='", 
+                    ")' opacity='0.", 
                     StringUtils.uintToString((maxPolyRepeat < 4 ? Random.randomInt(randomSeed + i + 16, 80, 100) : Random.randomInt(randomSeed + i + 16, 50, 80))), 
-                    "%' />"));
+                    "' />"));
 
                 polyRotation += polyRotationDelta;
             }

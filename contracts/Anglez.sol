@@ -118,27 +118,15 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
 
     function validateCustomParams(uint24 seed, uint8 shapeCount, uint8 tintRed, uint8 tintGreen, uint8 tintBlue, uint8 tintAlpha) public view returns (bool) {
 
-        if (usedRandomSeeds[seed]) {
-            console.log("Seed already used");
-            return false;
-        }
-        // TODO min shape count for linear should be higher?
-        if (shapeCount < 2 || shapeCount > 20) {
-            return false;
-        }
-        if (tintRed < 0 || tintRed > 255) {
-            return false;
-        }
-        if (tintGreen < 0 || tintGreen > 255) {
-            return false;
-        }
-        if (tintBlue < 0 || tintBlue > 255) {
-            return false;
-        }
-        if (tintAlpha < 0 || tintAlpha > 255) {
-            return false;
-        }
+        require(!usedRandomSeeds[seed], "SEED_USED");
+        require(shapeCount >= 2 && shapeCount <= 20, "INVALID_SHAPE_COUNT");
 
+        // don't need to validate rest because the only valid values for uint8 is 0 - 255
+        // require(tintRed >= 0 && tintRed <= 255, "INVALID_TINT_RED");
+        // require(tintGreen >= 0 && tintGreen <= 255, "INVALID_TINT_GREEN");
+        // require(tintBlue >= 0 && tintBlue <= 255, "IVALID_TINT_BLUE");
+        // require(tintAlpha >= 0 && tintAlpha <= 255, "INVALID_TINT_ALPHA");
+        
         return true;
     }
 
@@ -146,12 +134,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         uint256 tokenId = _nextTokenId();
         require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
         require(msg.value >= customMintPrice, "INSUFFICIENT_PAYMENT");
-        require(!usedRandomSeeds[seed], "SEED_USED");
-        require(shapeCount >= 2 && shapeCount <= 20, "INVALID_SHAPE_COUNT");
-        require(tintRed >= 0 && tintRed <= 255, "INVALID_TINT_RED");
-        require(tintGreen >= 0 && tintGreen <= 255, "INVALID_TINT_GREEN");
-        require(tintBlue >= 0 && tintBlue <= 255, "IVALID_TINT_BLUE");
-        require(tintAlpha >= 0 && tintAlpha <= 255, "INVALID_TINT_ALPHA");
+        validateCustomParams(seed, shapeCount, tintRed, tintGreen, tintBlue, tintAlpha);
 
         TokenParams memory tokenParams = TokenParams({
             randomSeed: seed,
