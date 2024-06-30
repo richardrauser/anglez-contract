@@ -154,6 +154,16 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
         tokenParamsMapping[tokenId] = tokenParams;
         usedRandomSeeds[seed] = true;
     }
+
+    // Royalties (ERC-2981)
+    function royaltyInfo(uint256 tokenId, uint256 salePrice) public view virtual override returns (address, uint256) {
+
+
+        uint256 royaltyAmount = (salePrice * 1000) / _feeDenominator();
+
+        return (owner(), royaltyAmount);
+    }
+
     
         // Returning minted NFTs
 

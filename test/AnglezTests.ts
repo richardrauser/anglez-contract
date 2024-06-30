@@ -343,6 +343,20 @@ describe("anglez tests", function () {
     });
   });
 
+  describe("ERC-2981 Royalties", function () {
+    it("Should build anglez", async function () {
+      const { contract, owner } = await loadFixture(deployAnglezFixture);
+
+      const info = await contract.royaltyInfo(0, 100);
+
+      // console.log("Royalty Info: ", JSON.stringify(royaltyInfo));
+
+      // expect(info[0]).to.equal(owner.address);
+      expect(info[1]).to.equal(10);
+      console.log("DONE!!!");
+    });
+  });
+
   describe("Events", function () {
     //   it("Should emit an event on withdrawals", async function () {
     //     const { lock, unlockTime, lockedAmount } = await loadFixture(
