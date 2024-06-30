@@ -37,7 +37,6 @@ library ArtBuilder {
 
     function getShapes(TokenParams memory tokenParams, uint maxPolyRepeat) private pure returns (string memory, string memory) {
         string memory shapes = "";
-        // TODO: consider best max ( 5 15?)
         // console.log('_------- RANDOM SEED: ' + randomSeed);
         uint minX = 1000;
         uint maxX = 0;
@@ -56,8 +55,6 @@ library ArtBuilder {
             // console.log('pointCount: ' + pointCount);
 
             string memory points = "";
-
-            // TODO: folded shapes by repeating points?
 
             // points loop
             for (uint j = 0; j < pointCount; j++) {
@@ -225,7 +222,7 @@ library ArtBuilder {
             '{"trait_type": "shapes", "value": "', StringUtils.uintToString(tokenParams.shapeCount), '"},',
              // TODO: ensure percentages show up properly in opensea
             '{"trait_type": "tint color", "value": "rgb(', StringUtils.uintToString(tokenParams.tint.red), ', ', StringUtils.uintToString(tokenParams.tint.green), ', ', StringUtils.uintToString(tokenParams.tint.blue), ')"},',
-            '{"trait_type": "tint transparency", "value": "', StringUtils.uintToString(tintAlpha), ' %"},',
+            '{"trait_type": "tint opacity", "value": "0.', StringUtils.uintToString(tintAlpha), '"},',
             '{"trait_type": "style", "value": "', tokenParams.cyclic ? "cyclic" : "linear",'"},',
             '{"trait_type": "structure", "value": "', tokenParams.chaotic ? "chaotic" : "folded",'"}',
             ']'));

@@ -344,7 +344,7 @@ describe("anglez tests", function () {
   });
 
   describe("ERC-2981 Royalties", function () {
-    it("Should build anglez", async function () {
+    it("Should return royalty info default", async function () {
       const { contract, owner } = await loadFixture(deployAnglezFixture);
 
       const info = await contract.royaltyInfo(0, 100);
@@ -353,7 +353,18 @@ describe("anglez tests", function () {
 
       // expect(info[0]).to.equal(owner.address);
       expect(info[1]).to.equal(10);
-      console.log("DONE!!!");
+    });
+
+    it("Should set royalty info", async function () {
+      const { contract, owner } = await loadFixture(deployAnglezFixture);
+
+      await contract.setTokenRoyalty(0, owner, 1500);
+      const info = await contract.royaltyInfo(0, 100);
+
+      // console.log("Royalty Info: ", JSON.stringify(royaltyInfo));
+
+      // expect(info[0]).to.equal(owner.address);
+      expect(info[1]).to.equal(15);
     });
   });
 

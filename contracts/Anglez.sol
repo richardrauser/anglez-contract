@@ -22,6 +22,7 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     mapping(uint24 => bool) private usedRandomSeeds;
 
     constructor() ERC721A("Anglez", "NGLZ") Ownable(msg.sender) {
+        _setDefaultRoyalty(owner(), 1000);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -75,13 +76,12 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     }
 
     function mintRandom(uint24 seed) public payable {
-        // TODO: Error messages
         uint256 tokenId = _nextTokenId();
         require(tokenId < TOKEN_LIMIT, "TOKEN_LIMIT_REACHED");
         require(msg.value >= randomMintPrice, "INSUFFICIENT_PAYMENT");
         require(!usedRandomSeeds[seed], "SEED_USED");
 
-        // TODO: support multi random mints via array of seeds?
+        // : support multi random mints via array of seeds?
         console.log("Minting with seed: ");
         console.log(seed);
         
@@ -156,15 +156,10 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     }
 
     // Royalties (ERC-2981)
-    function royaltyInfo(uint256 tokenId, uint256 salePrice) public view virtual override returns (address, uint256) {
 
-
-        uint256 royaltyAmount = (salePrice * 1000) / _feeDenominator();
-
-        return (owner(), royaltyAmount);
+    function setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator) public onlyOwner {
+        _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
-
-    
         // Returning minted NFTs
 
     function isSeedMinted(uint24 seed) public view returns (bool) {
@@ -174,11 +169,11 @@ contract Anglez is ERC721AQueryable, ERC2981, Ownable {
     function tokenURI(uint256 _tokenId) public view override(ERC721A, IERC721A) returns (string memory) {
         require(_exists(_tokenId), "BAD_ID");
     
-        // TODO: Consider if base64 encoding is necessary.. which chain to use?
+        // : Consider if base64 encoding is necessary.. which chain to use?
         // Base64 encode because OpenSea does not interpret data properly as plaintext served from Polygon
         return string(abi.encodePacked(
             'data:application/json,{"name":"NGLZ #',  StringUtils.uintToString(_tokenId), ': beautiful, colorful, abstract anglez",'
-                '"description": "Anglez is on-chain, generative NFT art - https://anglez.xyz", ', 
+                '"description": "Anglez is abstract, on-chain, generative NFT art created by volstrate, customised by you. - https://anglez.xyz", ', 
                 ArtBuilder.getTraits(tokenParamsMapping[_tokenId]), ', '
                 '"image": "data:image/svg+xml,', 
                 generateSvg(_tokenId), 

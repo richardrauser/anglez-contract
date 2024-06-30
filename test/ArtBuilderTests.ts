@@ -48,7 +48,7 @@ describe("Traits", function () {
     )[0].value;
 
     const tintAlpha = traitsJson.attributes.filter(
-      (attribute) => attribute.trait_type == "tint transparency"
+      (attribute) => attribute.trait_type == "tint opacity"
     )[0]?.value;
 
     const custom = traitsJson.attributes.filter(
@@ -65,7 +65,7 @@ describe("Traits", function () {
 
     expect(seed).to.equal("1234");
     expect(tintColor).to.equal("rgb(100, 101, 102)");
-    expect(tintAlpha).to.equal("19 %");
+    expect(tintAlpha).to.equal("0.19");
     expect(style).to.equal("linear");
     expect(structure).to.equal("chaotic");
     expect(custom).to.equal("true");
