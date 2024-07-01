@@ -20,6 +20,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
     },
+    base: {
+      url: `${process.env.COINBASE_BASE_URL}`,
+      accounts: [`0x${process.env.WALLET_PRIVATE_KEY}`],
+    },
     baseSepolia: {
       url: `${process.env.COINBASE_BASE_SEPOLIA_URL}`,
       accounts: [`0x${process.env.WALLET_PRIVATE_KEY}`],
@@ -48,11 +52,13 @@ const config: HardhatUserConfig = {
     //   },
   },
   etherscan: {
-    apiKey: {
-      sepolia: "U68IY6DYDAPQ99Z34E3HYG9K4F97I1ETK7",
-      // polygon: process.env.POLYGONSCAN_API_KEY,
-      // polygonMumbai: process.env.POLYGONSCAN_API_KEY,
-    },
+    apiUrl: "https://api.basescan.org",
+    apiKey: process.env.ETHERSCAN_API_KEY,
+    // sepolia: "U68IY6DYDAPQ99Z34E3HYG9K4F97I1ETK7",
+    // base:
+    // polygon: process.env.POLYGONSCAN_API_KEY,
+    // polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+    // },
   },
 };
 

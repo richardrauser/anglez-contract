@@ -1,6 +1,10 @@
-# Sample Hardhat Project
+# anglez smart contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This is a heavily customised ERC721A smart contract for the anglez NFT art project.
+
+https://anglez.xyz/
+
+The bulk of the heavy lifting for artwork creation is in ArtBuilder.sol
 
 Try running some of the following tasks:
 
